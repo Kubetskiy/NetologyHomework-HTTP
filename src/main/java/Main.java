@@ -20,43 +20,33 @@ public class Main {
         var allCats = retrieveCatsData();
 
         cats = gson.fromJson(allCats, Cat[].class);
-
+//      Получим фильтрованный лист
         List<Cat> catsWithVotes = Arrays.stream(cats).filter(cat -> cat.getUpvotes() > 0)
                 .toList();
 
+//      Тут чисто на экран выводим
         var gsonPP = new GsonBuilder().setPrettyPrinting().create();
 
         String s = gsonPP.toJson(catsWithVotes);
 
         System.out.println(s);
 
+//      Этот вариант вывода, если квадратные скобочки вначале и конце не нравятся
+        for (Cat cat : catsWithVotes) {
+            System.out.println(gsonPP.toJson(cat));
+        }
+    }
+
+    static String retrieveCatsData() throws IOException {
+
 /*
+//      Всё решалось намного проще...
         var url = new URL("https://raw.githubusercontent.com/netology-code/jd-homeworks/master/http/task1/cats");
         var urlConnection = url.openConnection();
 
         var stringInput = new String(urlConnection.getInputStream().readAllBytes());
         System.out.println(stringInput);
 */
-
-/*
-        var httpClient = HttpClient.newBuilder()
-                .version(HttpClient.Version.HTTP_1_1)
-                .build();
-
-        var request = HttpRequest.newBuilder(URI.create("https://raw.githubusercontent
-        .com/netology-code/jd-homeworks/master/http/task1/cats"))
-                .GET()
-                .build();
-
-        var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-        System.out.println(response.body());
-        System.out.println(response.headers());
-*/
-    }
-
-    static String retrieveCatsData() throws IOException {
-
         CloseableHttpClient httpClient = HttpClients.custom()
                 .setDefaultRequestConfig(RequestConfig.custom()
                         .setConnectTimeout(5000)    // максимальное время ожидание подключения к серверу
@@ -71,25 +61,5 @@ public class Main {
         CloseableHttpResponse response = httpClient.execute(request);
 
         return (new String(response.getEntity().getContent().readAllBytes()));
-
-/*
-        CloseableHttpClient client = HttpClients.custom()
-                .setSSLSocketFactory(new SSLConnectionSocketFactory(
-                        SSLContexts.createSystemDefault(),
-                        new String[] { "TLSv1.2" },
-                        null,
-                        SSLConnectionSocketFactory.getDefaultHostnameVerifier()))
-                .setConnectionTimeToLive(1, TimeUnit.MINUTES)
-                .setDefaultSocketConfig(SocketConfig.custom()
-                        .setSoTimeout(5000)
-                        .build())
-                .setDefaultRequestConfig(RequestConfig.custom()
-                        .setConnectTimeout(5000)
-                        .setSocketTimeout(5000)
-                        .setCookieSpec(CookieSpecs.STANDARD_STRICT)
-                        .build())
-                .build();    }
-*/
-
     }
 }
